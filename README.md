@@ -20,9 +20,16 @@ I use `Arduino 101` to be a `Bluetooth 4.0 Low Engry Central Device`,this progra
 ### 中文
 請將程式跑起來，打開 Terminal 介面，待程式啟動，連接到手環之後，輸入指令就可以獲得結果:
 
+
 | Command | Descritpion |
 | ------- | ----------- |
-|    H    | Read Current Hard Rate |
+|    H    | 讀取目前心律 |
 
+### English
+This command run in terminal, after `Arduino 101` connect to Band, enter command to get result:
+
+| Command |       Descritpion      |
+| ------- | ---------------------- |
+|    H    | Read Current Hard Rate |
 
 # 參考
