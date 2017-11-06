@@ -34,7 +34,7 @@ HashMap<int,char*> DEVICES = HashMap<int,char*>( hashRawArray , HASH_SIZE );
 String devices[HASH_SIZE] = {"E5:73:8A:4B:7D:85","D4:4E:82:0E:21:B7"};
 
 //現在使用的裝置暫存
-int device_use = 1;
+int device_use = 0;
  
 void setup() {
   Serial.begin(9600);
@@ -101,9 +101,23 @@ void loop() {
         Serial.println("Now Reading HartRate");
         int hartRate = readHartRate(peripheral,60); //30 seconds
         Serial.print("Final Hart Rate: ");
+        
+        //把這個值拿來使用即可 (wifi or enc28j60 網路傳輸，請使用這個值)
         Serial.print(hartRate);
         Serial.println();
       }
+
+      //開啟讀取血壓
+      if(readString.substring(0,1) == "B"){
+        Serial.println("Now Reading Blood Pressure");
+        String bp = readBloodPressure(peripheral,60); //30 seconds
+        Serial.print("Final BP: ");
+        
+        //把這個值拿來使用即可 (wifi or enc28j60 網路傳輸，請使用這個值)
+        Serial.print(bp);
+        Serial.println();
+      }
+      //
 
       //設定成其他(陣列中)的裝置
       if(readString.substring(0,3) == "SET"){
@@ -166,7 +180,7 @@ int readHartRate(BLEDevice peripheral, int seconds) {
   //寫入值，開始偵測心律
   Serial.println("Function: Start To Read Hart Rate...");
   const byte openHartRateByte[] = {0xD0, 0x01};
-  WriteCharacteristic.writeValue(openHartRateByte,2);
+  WriteCharacteristic.writeValue(openHartRateByte,2); //設定為 2 個 byte
   
   //開始進行遍歷值
   while (peripheral.connected()) {
@@ -180,7 +194,6 @@ int readHartRate(BLEDevice peripheral, int seconds) {
     String hartRate = "";
     while(i<len)
     {
-      //Serial.print(static_cast<unsigned char>(val[i++]));
       hartRate += static_cast<unsigned char>(val[i++]);
       hartRate += ",";
     }
@@ -196,9 +209,6 @@ int readHartRate(BLEDevice peripheral, int seconds) {
     data += static_cast<unsigned char>(val[1]);
     Serial.print(data);
 
-    //你可以選擇舊的取值方式，或打印 hartRate 不加陣列索引，給電腦更多判斷選項。
-    /*Serial.print(hartRate[3]);
-    Serial.print(hartRate[4]);*/
     Serial.println("");
     delay(50);
 
@@ -219,4 +229,90 @@ int readHartRate(BLEDevice peripheral, int seconds) {
 
   Serial.println("Peripheral disconnected");
   return -1;
+}
+
+String readBloodPressure(BLEDevice peripheral, int seconds) {
+  //歸 0 系統計數
+  count = 0;
+    
+  // connect to the peripheral
+  Serial.println("Connecting ...");
+
+  if (peripheral.connect()) {
+    Serial.println("Connected");
+  } else {
+    Serial.println("Failed to connect!");
+    return "connect to peripheral failed!";
+  }
+
+  // discover peripheral attributes
+  Serial.println("Discovering attributes ...");
+  if (peripheral.discoverAttributesByService("f0080001-0451-4000-b000-000000000000")) {
+    Serial.println("Attributes discovered");
+  } else {
+    Serial.println("Attribute discovery failed!");
+    peripheral.disconnect();
+    return "connect to services failed!";
+  }
+
+  //Write Type 的 Characteristic 值
+  BLECharacteristic WriteCharacteristic = peripheral.characteristic("f0080003-0451-4000-b000-000000000000");
+
+  // Read Type 的 Characteristic 值
+  BLECharacteristic ReadCharacteristic = peripheral.characteristic("f0080002-0451-4000-b000-000000000000");
+
+  //寫入值，開始偵測心律
+  Serial.println("Function: Start To Read Hart Rate...");
+  const byte openBPByte[] = {0x90, 0x01, 0x00};
+  WriteCharacteristic.writeValue(openBPByte,3); //設定為 3 個 byte
+  
+  //開始進行遍歷值
+  while (peripheral.connected()) {
+    //繼續計時器的計數
+    tcb.update();
+    
+    unsigned char len = ReadCharacteristic.valueLength();
+    const unsigned char *val = ReadCharacteristic.value();
+    unsigned char i = 0;
+
+    String BP = "";
+    while(i<len)
+    {
+      BP += static_cast<unsigned char>(val[i++]);
+      BP += ",";
+    }
+
+    char cgy[500];
+    sprintf(cgy, "", ReadCharacteristic.value(), ReadCharacteristic.read());
+    Serial.print(cgy);
+
+    //一般直接取得新律值的方式
+    Serial.print(count);
+    Serial.print(",");
+    String data = "";
+    data += static_cast<unsigned char>(val[1]);
+    data += ",";
+    data += static_cast<unsigned char>(val[2]);
+    Serial.print(data);
+
+    Serial.println("");
+    delay(50);
+
+    if(count == seconds){
+      //取得最後一個血壓值，寫入佔存器
+      String currentBP = data;
+
+      //關閉偵測心律
+      Serial.println("Function: Stop To Read BP...");
+      const byte ba[] = {0x90, 0x00, 0x00};
+      WriteCharacteristic.writeValue(ba,3);
+      
+      //結束後記得一定要斷接
+      peripheral.disconnect();
+      return currentBP;
+    }
+  }
+
+  Serial.println("Peripheral disconnected");
+  return "no data";
 }
