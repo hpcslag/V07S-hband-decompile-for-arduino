@@ -16,6 +16,19 @@ I use `Arduino 101` to be a `Bluetooth 4.0 Low Engry Central Device`,this progra
 
  - Hband V07S Product
  - Arduino 101 Product
+ 
+# Setup & Usage (設定和使用方式)
+
+### 中文
+`Control` 這個專案是舊版的，只針對單一裝置命名為 `V07S` 進行連接，而且只提供心律功能。
+
+`async_control` 這個專案是目前的版本，使用前要先到這個檔案的 [27 行](https://github.com/hpcslag/V07S-hband-decompile-for-arduino/blob/251357eefb5931e331094a69cbe4aa0e1a8a7a8f/async_control/Control/Control.ino#L27) 修改要連接的裝置數量，然後再把 Mac 地址加入到 [34行](https://github.com/hpcslag/V07S-hband-decompile-for-arduino/blob/251357eefb5931e331094a69cbe4aa0e1a8a7a8f/async_control/Control/Control.ino#L34) 的字串陣列中，記得要先被連接的裝置要放在第一個陣列中。
+
+### English
+
+`Control` folder is old project, it just can connect to device which name is `V07S`, and only provide Heart Rate Feature.
+
+`async_control` is current version project, before using this project, you have to modify [line 27](https://github.com/hpcslag/V07S-hband-decompile-for-arduino/blob/251357eefb5931e331094a69cbe4aa0e1a8a7a8f/async_control/Control/Control.ino#L27) change to the number of current devices, and add Mac Address of each BT devices in string arrays to [line 34](https://github.com/hpcslag/V07S-hband-decompile-for-arduino/blob/251357eefb5931e331094a69cbe4aa0e1a8a7a8f/async_control/Control/Control.ino#L34). (Notice that the first device to be connected is placed on the first index of array)
 
 # Description (說明)
 
