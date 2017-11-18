@@ -23,13 +23,17 @@ I use `Arduino 101` to be a `Bluetooth 4.0 Low Engry Central Device`,this progra
 
 | Command | Descritpion |
 | ------- | ----------- |
-|    H    | 讀取目前心律 |
+|    H    | 讀取目前心律  |
+|    B    | 讀取目前血壓  |
+|  SET[n] | 設定藍芽裝置， [n] 請換成佇列號(從 0 開始)，在 [27 行](https://github.com/hpcslag/V07S-hband-decompile-for-arduino/blob/251357eefb5931e331094a69cbe4aa0e1a8a7a8f/async_control/Control/Control.ino#L27) 先更改裝置數量，再把 MAC Address 加入到 [34行](https://github.com/hpcslag/V07S-hband-decompile-for-arduino/blob/251357eefb5931e331094a69cbe4aa0e1a8a7a8f/async_control/Control/Control.ino#L34) 的字串陣列中。 | 
 
 ### English
 This command run in terminal, after `Arduino 101` connect to Band, enter command to get result:
 
 | Command |       Descritpion      |
 | ------- | ---------------------- |
-|    H    | Read Current Hard Rate |
+|    H    | Read Current Hard Rate |
+|    B    | Read Current Blood Pressure |
+|  SET[n] | Set to connect to other Bluetooth Device, Please setup in [line 27](https://github.com/hpcslag/V07S-hband-decompile-for-arduino/blob/251357eefb5931e331094a69cbe4aa0e1a8a7a8f/async_control/Control/Control.ino#L27) change to the number of current devices, and add Mac Address of each BT devices in string arrays to [line 34](https://github.com/hpcslag/V07S-hband-decompile-for-arduino/blob/251357eefb5931e331094a69cbe4aa0e1a8a7a8f/async_control/Control/Control.ino#L34). |
 
 # 參考
